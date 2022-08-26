@@ -16,10 +16,18 @@ import io.confluent.ksql.function.udf.UdfParameter;
 public class GeoIntersectedCircle extends GeometryBase {
   @Udf(description = "determines if a the two geometries intersect.")
   public boolean intersected_circle (
+          @UdfParameter(value = "ae", description = "WKT or GeoJSON Encoded Geometry to check for intersection with polygon") final String ae,
+          @UdfParameter(value = "cnt", description = "WKT or GeoJSON Encoded Geometry to check for intersection with polygon") final String cnt,
           @UdfParameter(value = "polygon", description = "WKT or GeoJSON Encoded Geometry to check for intersection with polygon") final String polygon)
           throws GeometryParseException {
 
+    System.out.println("===================================");
+    System.out.println(ae);
+    System.out.println(cnt);
     System.out.println(polygon);
+    System.out.println("===================================");
+
+
     return true;
   }
 }
