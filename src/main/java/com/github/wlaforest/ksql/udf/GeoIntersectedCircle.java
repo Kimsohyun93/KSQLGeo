@@ -88,6 +88,7 @@ public final class GeoIntersectedCircle {
         final String polygon = newValue.getString(POLYGON);
 
         System.out.println(aeName + cntName + polygon);
+        aggregateValue.put(new Carriage(aeName, cntName),polygon);
         return aggregateValue;
       }
 
