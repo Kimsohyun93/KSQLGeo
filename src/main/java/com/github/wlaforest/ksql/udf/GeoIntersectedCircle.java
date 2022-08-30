@@ -1,6 +1,7 @@
 package com.github.wlaforest.ksql.udf;
 
 import com.github.wlaforest.geo.GeometryParseException;
+import com.github.wlaforest.geo.Spatial4JHelper;
 import io.confluent.ksql.function.udaf.Udaf;
 import io.confluent.ksql.function.udaf.UdafDescription;
 import io.confluent.ksql.function.udaf.UdafFactory;
@@ -11,6 +12,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import com.github.wlaforest.ksql.udf.GeoIntersectedUDF.*;
 
 import java.util.*;
 
@@ -22,7 +24,7 @@ import java.util.*;
         version = "1.3.1",
         author = "Will LaForest"
 )
-public final class GeoIntersectedCircle extends GeometryBase{
+public class GeoIntersectedCircle extends GeometryBase {
     private static final String AE = "AE";
     private static final String CNT = "CNT";
     private static final String RESOURCE_NAME = "RESOURCE_NAME";
@@ -99,6 +101,7 @@ public final class GeoIntersectedCircle extends GeometryBase{
       public Struct map(final Map<String, String> agg) {
         JSONParser jsonParser = new JSONParser();
         Struct result = new Struct(RETURN_SCHEMA);
+        Spatial4JHelper test = new Spatial4JHelper();
 
         Map<String, String> sortedMap = new TreeMap<>(agg);
         boolean intersect_response;
@@ -110,53 +113,53 @@ public final class GeoIntersectedCircle extends GeometryBase{
         System.out.println("========== AGG KEYSET");
         System.out.println(sortedMap.keySet());
 
-//
-//        for(String key1 : sortedMap.keySet()){
-//          try {
-//            Object obj = jsonParser.parse(key1);
-//
-//            if (obj instanceof JSONObject) {
-//              key1Resource = (JSONObject)obj;
-//            }
-//          } catch (ParseException e) {
-//            e.printStackTrace();
-//          }
-//
-//          for(String key2 : sortedMap.keySet()){
-//            try {
-//              Object obj = jsonParser.parse(key2);
-//
-//              if (obj instanceof JSONObject) {
-//                key2Resource = (JSONObject)obj;
-//              }
-//            } catch (ParseException e) {
-//              e.printStackTrace();
-//            }
-//
-//            try {
-//              if(!Objects.equals(key1, key2)){
-//                intersect_response = getSpatial4JHelper().intersect(sortedMap.get(key1), sortedMap.get(key2));
-//
-//                if(intersect_response){
-//
-//                  JSONArray itstedArrlist1 = intersected_result.getOrDefault(key1Resource, new JSONArray());
-//                  itstedArrlist1.add(key2Resource);
-//                  intersected_result.put(key1Resource, itstedArrlist1);
-//
-//                  JSONArray itstedArrlist2 = intersected_result.getOrDefault(key2Resource, new JSONArray());
-//                  itstedArrlist2.add(key1Resource);
-//                  intersected_result.put(key2Resource, itstedArrlist2);
-//                }
-//              }
-//            } catch (GeometryParseException e) {
-//              e.printStackTrace();
-//            }
-//          }
-//          sortedMap.remove(key1);
-////          result.put(RESOURCE, key1Resource.toString());
-////          result.put(INTERSECTED, intersected_result.get(key1Resource).toString());
-//          result.put(key1Resource.toJSONString(), intersected_result.get(key1Resource).toJSONString());
-//        }
+
+        for(String key1 : sortedMap.keySet()){
+          try {
+            Object obj = jsonParser.parse(key1);
+
+            if (obj instanceof JSONObject) {
+              key1Resource = (JSONObject)obj;
+            }
+          } catch (ParseException e) {
+            e.printStackTrace();
+          }
+
+          for(String key2 : sortedMap.keySet()){
+            try {
+              Object obj = jsonParser.parse(key2);
+
+              if (obj instanceof JSONObject) {
+                key2Resource = (JSONObject)obj;
+              }
+            } catch (ParseException e) {
+              e.printStackTrace();
+            }
+
+            try {
+              if(!Objects.equals(key1, key2)){
+                intersect_response = test.intersect(sortedMap.get(key1), sortedMap.get(key2));
+
+                if(intersect_response){
+
+                  JSONArray itstedArrlist1 = intersected_result.getOrDefault(key1Resource, new JSONArray());
+                  itstedArrlist1.add(key2Resource);
+                  intersected_result.put(key1Resource, itstedArrlist1);
+
+                  JSONArray itstedArrlist2 = intersected_result.getOrDefault(key2Resource, new JSONArray());
+                  itstedArrlist2.add(key1Resource);
+                  intersected_result.put(key2Resource, itstedArrlist2);
+                }
+              }
+            } catch (GeometryParseException e) {
+              e.printStackTrace();
+            }
+          }
+          sortedMap.remove(key1);
+//          result.put(RESOURCE, key1Resource.toString());
+//          result.put(INTERSECTED, intersected_result.get(key1Resource).toString());
+          result.put(key1Resource.toJSONString(), intersected_result.get(key1Resource).toJSONString());
+        }
 
         System.out.println(result);
         return result;
