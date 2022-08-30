@@ -3,7 +3,6 @@ package com.github.wlaforest.ksql.udf;
 import io.confluent.ksql.function.udaf.Udaf;
 import io.confluent.ksql.function.udaf.UdafDescription;
 import io.confluent.ksql.function.udaf.UdafFactory;
-import io.confluent.ksql.function.udf.UdfDescription;
 import org.apache.kafka.connect.data.Schema;
 import org.apache.kafka.connect.data.SchemaBuilder;
 import org.apache.kafka.connect.data.Struct;
@@ -18,7 +17,7 @@ import java.util.*;
 //        version = "0.1.0-SNAPSHOT",
 //        author = "shkim"
 //)
-@UdfDescription(
+@UdafDescription(
         name = "intersected_circle",
         description = "UDF function to test for geometry intersection in euclidean space. geometry encoded in " +
                 "WKT or GeoJSON. null value result in false being returned.",
