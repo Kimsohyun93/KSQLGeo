@@ -65,35 +65,23 @@ public final class GeoIntersectedCircle {
   private GeoIntersectedCircle() {
   }
 
-  @UdafFactory(description = "compute if polygon intersected",
+  @UdafFactory(description = "check polygon intersected",
           paramSchema = PARAM_SCHEMA_DESCRIPTOR,
           returnSchema = RETURN_SCHEMA_DESCRIPTOR)
-  public static Udaf<Struct, Map<String, Double>, Struct> createUdaf() {
+  public static Udaf<Struct, Map<Carriage, String>, Struct> createUdaf() {
 
-    return new Udaf<Struct, Map<String, Double>,Struct>() {
+    return new Udaf<Struct, Map<Carriage, String>,Struct>() {
 
-      /**
-       * Specify an initial value for our aggregation
-       *
-       * @return the initial state of the aggregate.
-       */
       @Override
-      public Map<String, Double> initialize() {
-        final Map<String, Double> stats = new HashMap<>();
+      public Map<Carriage, String> initialize() {
+        final Map<Carriage, String> stats = new HashMap<>();
         return stats;
       }
 
-      /**
-       * Perform the aggregation whenever a new record appears in our stream.
-       *
-       * @param newValue the new value to add to the {@code aggregateValue}.
-       * @param aggregateValue the current aggregate.
-       * @return the new aggregate value.
-       */
       @Override
-      public Map<String, Double> aggregate(
+      public Map<Carriage, String> aggregate(
               final Struct newValue,
-              final Map<String, Double> aggregateValue
+              final Map<Carriage, String> aggregateValue
       ) {
         final String aeName = newValue.getString(AE);
         final String cntName = newValue.getString(CNT);
@@ -103,31 +91,18 @@ public final class GeoIntersectedCircle {
         return aggregateValue;
       }
 
-      /**
-       * Called to merge two aggregates together.
-       * The merge method is only called when merging sessions when session windowing is used.
-       *
-       * @param aggOne the first aggregate
-       * @param aggTwo the second aggregate
-       * @return the merged result
-       */
+
       @Override
-      public Map<String, Double> merge(
-              final Map<String, Double> aggOne,
-              final Map<String, Double> aggTwo
+      public Map<Carriage, String> merge(
+              final Map<Carriage, String> aggOne,
+              final Map<Carriage, String> aggTwo
       ) {
         System.out.println("========== MERGE FUNCTION");
         return aggOne;
       }
 
-      /**
-       * Called to map the intermediate aggregate value to the final output.
-       *
-       * @param agg the aggregate
-       * @return the result of aggregation
-       */
       @Override
-      public Struct map(final Map<String, Double> agg) {
+      public Struct map(final Map<Carriage, String> agg) {
         Struct result = new Struct(RETURN_SCHEMA);
         return result;
       }
