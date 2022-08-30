@@ -69,20 +69,20 @@ public final class GeoIntersectedCircle {
   @UdafFactory(description = "check polygon intersected",
           paramSchema = PARAM_SCHEMA_DESCRIPTOR,
           returnSchema = RETURN_SCHEMA_DESCRIPTOR)
-  public static Udaf<Struct, Map<JSONObject, String>, Struct> createUdaf() {
+  public static Udaf<Struct, Map<String, String>, Struct> createUdaf() {
 
-    return new Udaf<Struct, Map<JSONObject, String>,Struct>() {
+    return new Udaf<Struct, Map<String, String>,Struct>() {
 
       @Override
-      public Map<JSONObject, String> initialize() {
-        final Map<JSONObject, String> stats = new HashMap<>();
+      public Map<String, String> initialize() {
+        final Map<String, String> stats = new HashMap<>();
         return stats;
       }
 
       @Override
-      public Map<JSONObject, String> aggregate(
+      public Map<String, String> aggregate(
               final Struct newValue,
-              final Map<JSONObject, String> aggregateValue
+              final Map<String, String> aggregateValue
       ) {
         final String aeName = newValue.getString(AE);
         final String cntName = newValue.getString(CNT);
@@ -91,22 +91,22 @@ public final class GeoIntersectedCircle {
         jsonObject.put(AE, aeName);
         jsonObject.put(CNT, cntName);
         System.out.println(aeName + cntName + polygon);
-        aggregateValue.put(jsonObject,polygon);
+        aggregateValue.put(jsonObject.toJSONString(),polygon);
         return aggregateValue;
       }
 
 
       @Override
-      public Map<JSONObject, String> merge(
-              final Map<JSONObject, String> aggOne,
-              final Map<JSONObject, String> aggTwo
+      public Map<String, String> merge(
+              final Map<String, String> aggOne,
+              final Map<String, String> aggTwo
       ) {
         System.out.println("========== MERGE FUNCTION");
         return aggOne;
       }
 
       @Override
-      public Struct map(final Map<JSONObject, String> agg) {
+      public Struct map(final Map<String, String> agg) {
         Struct result = new Struct(RETURN_SCHEMA);
         return result;
       }
