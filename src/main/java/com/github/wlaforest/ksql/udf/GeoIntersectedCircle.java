@@ -113,49 +113,49 @@ public final class  GeoIntersectedCircle extends GeometryBase {
       public Struct map(final Map<Carriage, String> agg) {
 
         Struct result = new Struct(RETURN_SCHEMA);
-        // 키로 정렬
-        Map<Carriage, String> sortedMap = new TreeMap<>(agg);
-        boolean intersect_response;
-        Map<Map<String, String>, ArrayList<Map<String, String>>> intersected_result = new HashMap<>();
-
-        System.out.println("========== AGG KEYSET");
-        System.out.println(sortedMap.keySet());
-
-
-        for(Carriage key1 : sortedMap.keySet()){
-          Map<String, String> key1Resource = new HashMap<>();
-          key1Resource.put(AE, key1.getAe());
-          key1Resource.put(CNT, key1.getCnt());
-
-          for(Carriage key2 : sortedMap.keySet()){
-            Map<String, String> key2Resource = new HashMap<>();
-            key2Resource.put(AE, key2.getAe());
-            key2Resource.put(CNT, key2.getCnt());
-
-            try {
-              if(key1 != key2){
-                intersect_response = getSpatial4JHelper().intersect(sortedMap.get(key1), sortedMap.get(key2));
-
-                if(intersect_response){
-
-                  ArrayList<Map<String, String>> itstedArrlist1 = intersected_result.getOrDefault(key1Resource, new ArrayList<>());
-                  itstedArrlist1.add(key2Resource);
-                  intersected_result.put(key1Resource, itstedArrlist1);
-
-                  ArrayList<Map<String, String>> itstedArrlist2 = intersected_result.getOrDefault(key2Resource, new ArrayList<>());
-                  itstedArrlist2.add(key1Resource);
-                  intersected_result.put(key2Resource, itstedArrlist2);
-                }
-              }
-            } catch (GeometryParseException e) {
-              e.printStackTrace();
-            }
-          }
-          sortedMap.remove(key1);
-//          result.put(RESOURCE, key1Resource.toString());
-//          result.put(INTERSECTED, intersected_result.get(key1Resource).toString());
-          result.put(key1Resource.toString(), intersected_result.get(key1Resource).toString());
-        }
+//        // 키로 정렬
+//        Map<Carriage, String> sortedMap = new TreeMap<>(agg);
+//        boolean intersect_response;
+//        Map<Map<String, String>, ArrayList<Map<String, String>>> intersected_result = new HashMap<>();
+//
+//        System.out.println("========== AGG KEYSET");
+//        System.out.println(sortedMap.keySet());
+//
+//
+//        for(Carriage key1 : sortedMap.keySet()){
+//          Map<String, String> key1Resource = new HashMap<>();
+//          key1Resource.put(AE, key1.getAe());
+//          key1Resource.put(CNT, key1.getCnt());
+//
+//          for(Carriage key2 : sortedMap.keySet()){
+//            Map<String, String> key2Resource = new HashMap<>();
+//            key2Resource.put(AE, key2.getAe());
+//            key2Resource.put(CNT, key2.getCnt());
+//
+//            try {
+//              if(key1 != key2){
+//                intersect_response = getSpatial4JHelper().intersect(sortedMap.get(key1), sortedMap.get(key2));
+//
+//                if(intersect_response){
+//
+//                  ArrayList<Map<String, String>> itstedArrlist1 = intersected_result.getOrDefault(key1Resource, new ArrayList<>());
+//                  itstedArrlist1.add(key2Resource);
+//                  intersected_result.put(key1Resource, itstedArrlist1);
+//
+//                  ArrayList<Map<String, String>> itstedArrlist2 = intersected_result.getOrDefault(key2Resource, new ArrayList<>());
+//                  itstedArrlist2.add(key1Resource);
+//                  intersected_result.put(key2Resource, itstedArrlist2);
+//                }
+//              }
+//            } catch (GeometryParseException e) {
+//              e.printStackTrace();
+//            }
+//          }
+//          sortedMap.remove(key1);
+////          result.put(RESOURCE, key1Resource.toString());
+////          result.put(INTERSECTED, intersected_result.get(key1Resource).toString());
+//          result.put(key1Resource.toString(), intersected_result.get(key1Resource).toString());
+//        }
 
         System.out.println(result);
         return result;
