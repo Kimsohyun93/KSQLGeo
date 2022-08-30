@@ -17,6 +17,7 @@ import java.util.*;
         author = "Will LaForest"
 )
 public final class GeoIntersectedCircle {
+
   public static class Carriage{
         private String ae;
         private String cnt;
@@ -64,19 +65,12 @@ public final class GeoIntersectedCircle {
   private GeoIntersectedCircle() {
   }
 
-  @UdafFactory(description = "check polygon is intersected")
-  /**
-   * Can be used with stream aggregations. The input of our aggregation will be doubles,
-   * and the output will be a map
-   *
-   * @param I is the input type of the UDAF. A is the data type of the intermediate storage used to keep track of the state of the UDAF. O is the data type of the return value.
-   * @return int[]
-   */
+  @UdafFactory(description = "compute if polygon intersected",
+          paramSchema = PARAM_SCHEMA_DESCRIPTOR,
+          returnSchema = RETURN_SCHEMA_DESCRIPTOR)
+  public static Udaf<Struct, Map<String, Double>, Struct> createUdaf() {
 
-  //
-  public static Udaf<Double, Map<String, Double>, Map<String, Double>> createUdaf() {
-
-    return new Udaf<Double, Map<String, Double>, Map<String, Double>>() {
+    return new Udaf<Struct, Map<String, Double>,Struct>() {
 
       /**
        * Specify an initial value for our aggregation
@@ -98,19 +92,14 @@ public final class GeoIntersectedCircle {
        */
       @Override
       public Map<String, Double> aggregate(
-              final Double newValue,
+              final Struct newValue,
               final Map<String, Double> aggregateValue
       ) {
-        final Double sampleSize = 1.0 + aggregateValue
-                .getOrDefault("sample_size", 0.0);
+        final String aeName = newValue.getString(AE);
+        final String cntName = newValue.getString(CNT);
+        final String polygon = newValue.getString(POLYGON);
 
-        final Double sum = newValue + aggregateValue
-                .getOrDefault("sum", 0.0);
-
-        // calculate the new aggregate
-        aggregateValue.put("mean", sum / sampleSize);
-        aggregateValue.put("sample_size", sampleSize);
-        aggregateValue.put("sum", sum);
+        System.out.println(aeName + cntName + polygon);
         return aggregateValue;
       }
 
@@ -127,17 +116,8 @@ public final class GeoIntersectedCircle {
               final Map<String, Double> aggOne,
               final Map<String, Double> aggTwo
       ) {
-        final Double sampleSize =
-                aggOne.getOrDefault("sample_size", 0.0) + aggTwo.getOrDefault("sample_size", 0.0);
-        final Double sum =
-                aggOne.getOrDefault("sum", 0.0) + aggTwo.getOrDefault("sum", 0.0);
-
-        // calculate the new aggregate
-        final Map<String, Double> newAggregate = new HashMap<>();
-        newAggregate.put("mean", sum / sampleSize);
-        newAggregate.put("sample_size", sampleSize);
-        newAggregate.put("sum", sum);
-        return newAggregate;
+        System.out.println("========== MERGE FUNCTION");
+        return aggOne;
       }
 
       /**
@@ -147,8 +127,9 @@ public final class GeoIntersectedCircle {
        * @return the result of aggregation
        */
       @Override
-      public Map<String, Double> map(final Map<String, Double> agg) {
-        return agg;
+      public Struct map(final Map<String, Double> agg) {
+        Struct result = new Struct(RETURN_SCHEMA);
+        return result;
       }
     };
   }

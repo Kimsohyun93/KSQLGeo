@@ -33,19 +33,8 @@ public class GeoIntersectedUDF extends GeometryBase {
         return getSpatial4JHelper().intersect(geo1,geo2);
     }
 }
+
 //
-//package com.github.wlaforest.ksql.udf;
-//
-//        import io.confluent.ksql.function.udaf.Udaf;
-//        import io.confluent.ksql.function.udaf.UdafDescription;
-//        import io.confluent.ksql.function.udaf.UdafFactory;
-//        import org.apache.kafka.connect.data.Schema;
-//        import org.apache.kafka.connect.data.SchemaBuilder;
-//        import org.apache.kafka.connect.data.Struct;
-//
-//        import java.util.*;
-//
-////
 ////@UdafDescription(
 ////        name = "intersected_circle",
 ////        description = "UDF function to test for geometry intersection in euclidean space. geometry encoded in " +
@@ -147,9 +136,9 @@ public class GeoIntersectedUDF extends GeometryBase {
 //                    final Map<Carriage, String> aggTwo
 //            ) {
 //                System.out.println("========== MERGE FUNCTION");
-//
 //                return aggOne;
 //            }
+//
 //
 //            @Override
 //            public Struct map(final Map<Carriage, String> agg) {
