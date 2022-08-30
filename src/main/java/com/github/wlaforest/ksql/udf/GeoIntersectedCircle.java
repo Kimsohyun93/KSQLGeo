@@ -73,7 +73,7 @@ public final class GeoIntersectedCircle extends GeometryBase{
   @UdafFactory(description = "check polygon intersected",
           paramSchema = PARAM_SCHEMA_DESCRIPTOR,
           returnSchema = RETURN_SCHEMA_DESCRIPTOR)
-  public static Udaf<Struct, Map<String, String>, Struct> createUdaf() {
+  public Udaf<Struct, Map<String, String>, Struct> createUdaf() {
 
     return new Udaf<Struct, Map<String, String>,Struct>() {
 
@@ -118,10 +118,11 @@ public final class GeoIntersectedCircle extends GeometryBase{
 
         Map<String, String> sortedMap = new TreeMap<>(agg);
         boolean intersect_response;
-        Map<JSONObject, ArrayList<Map<String, String>>> intersected_result = new HashMap<>();
-
+        Map<JSONObject, JSONArray> intersected_result = new HashMap<>();
         JSONObject key1Resource = null;
         JSONObject key2Resource = null;
+
+
         System.out.println("========== AGG KEYSET");
         System.out.println(sortedMap.keySet());
 
@@ -149,16 +150,16 @@ public final class GeoIntersectedCircle extends GeometryBase{
             }
 
             try {
-              if(key1 != key2){
+              if(!Objects.equals(key1, key2)){
                 intersect_response = getSpatial4JHelper().intersect(sortedMap.get(key1), sortedMap.get(key2));
 
                 if(intersect_response){
 
-                  ArrayList<Map<String, String>> itstedArrlist1 = intersected_result.getOrDefault(key1Resource, new ArrayList<>());
+                  JSONArray itstedArrlist1 = intersected_result.getOrDefault(key1Resource, new JSONArray());
                   itstedArrlist1.add(key2Resource);
                   intersected_result.put(key1Resource, itstedArrlist1);
 
-                  ArrayList<Map<String, String>> itstedArrlist2 = intersected_result.getOrDefault(key2Resource, new ArrayList<>());
+                  JSONArray itstedArrlist2 = intersected_result.getOrDefault(key2Resource, new JSONArray());
                   itstedArrlist2.add(key1Resource);
                   intersected_result.put(key2Resource, itstedArrlist2);
                 }
@@ -170,7 +171,7 @@ public final class GeoIntersectedCircle extends GeometryBase{
           sortedMap.remove(key1);
 //          result.put(RESOURCE, key1Resource.toString());
 //          result.put(INTERSECTED, intersected_result.get(key1Resource).toString());
-          result.put(key1Resource.toString(), intersected_result.get(key1Resource).toString());
+          result.put(key1Resource.toJSONString(), intersected_result.get(key1Resource).toJSONString());
         }
 
         System.out.println(result);

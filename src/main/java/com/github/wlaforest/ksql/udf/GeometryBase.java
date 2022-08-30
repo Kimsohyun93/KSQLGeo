@@ -9,7 +9,7 @@ abstract class GeometryBase implements Configurable
 {
     private final Spatial4JHelper spatial4JHelper = new Spatial4JHelper();
 
-    public static Spatial4JHelper getSpatial4JHelper()
+    public Spatial4JHelper getSpatial4JHelper()
     {
         return spatial4JHelper;
     }
