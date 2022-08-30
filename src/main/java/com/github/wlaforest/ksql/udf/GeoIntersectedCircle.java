@@ -124,13 +124,13 @@ public final class  GeoIntersectedCircle extends GeometryBase {
 
         for(Carriage key1 : sortedMap.keySet()){
           Map<String, String> key1Resource = new HashMap<>();
-          key1Resource.put(AE, key1.ae);
-          key1Resource.put(CNT, key1.cnt);
+          key1Resource.put(AE, key1.getAe());
+          key1Resource.put(CNT, key1.getCnt());
 
           for(Carriage key2 : sortedMap.keySet()){
             Map<String, String> key2Resource = new HashMap<>();
-            key2Resource.put(AE, key2.ae);
-            key2Resource.put(CNT, key2.cnt);
+            key2Resource.put(AE, key2.getAe());
+            key2Resource.put(CNT, key2.getCnt());
 
             try {
               if(key1 != key2){
