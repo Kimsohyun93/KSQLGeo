@@ -14,22 +14,6 @@ import org.json.simple.parser.ParseException;
 
 import java.util.*;
 
-class Carriage{
-  private String ae;
-  private String cnt;
-
-  public Carriage(String ae, String cnt){
-    this.ae = ae;
-    this.cnt =cnt;
-  }
-
-  public String getAe(){
-    return this.ae;
-  }
-  public String getCnt(){
-    return this.cnt;
-  }
-}
 
 @UdafDescription(
         name = "intersected_circle",
@@ -73,7 +57,7 @@ public final class GeoIntersectedCircle extends GeometryBase{
   @UdafFactory(description = "check polygon intersected",
           paramSchema = PARAM_SCHEMA_DESCRIPTOR,
           returnSchema = RETURN_SCHEMA_DESCRIPTOR)
-  public Udaf<Struct, Map<String, String>, Struct> createUdaf() {
+  public static Udaf<Struct, Map<String, String>, Struct> createUdaf() {
 
     return new Udaf<Struct, Map<String, String>,Struct>() {
 
