@@ -6,6 +6,7 @@ import io.confluent.ksql.function.udaf.UdafFactory;
 import org.apache.kafka.connect.data.Schema;
 import org.apache.kafka.connect.data.SchemaBuilder;
 import org.apache.kafka.connect.data.Struct;
+import org.json.simple.JSONObject;
 
 import java.util.*;
 
@@ -68,42 +69,44 @@ public final class GeoIntersectedCircle {
   @UdafFactory(description = "check polygon intersected",
           paramSchema = PARAM_SCHEMA_DESCRIPTOR,
           returnSchema = RETURN_SCHEMA_DESCRIPTOR)
-  public static Udaf<Struct, Map<Carriage, String>, Struct> createUdaf() {
+  public static Udaf<Struct, Map<JSONObject, String>, Struct> createUdaf() {
 
-    return new Udaf<Struct, Map<Carriage, String>,Struct>() {
+    return new Udaf<Struct, Map<JSONObject, String>,Struct>() {
 
       @Override
-      public Map<Carriage, String> initialize() {
-        final Map<Carriage, String> stats = new HashMap<>();
+      public Map<JSONObject, String> initialize() {
+        final Map<JSONObject, String> stats = new HashMap<>();
         return stats;
       }
 
       @Override
-      public Map<Carriage, String> aggregate(
+      public Map<JSONObject, String> aggregate(
               final Struct newValue,
-              final Map<Carriage, String> aggregateValue
+              final Map<JSONObject, String> aggregateValue
       ) {
         final String aeName = newValue.getString(AE);
         final String cntName = newValue.getString(CNT);
         final String polygon = newValue.getString(POLYGON);
-
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put(AE, aeName);
+        jsonObject.put(CNT, cntName);
         System.out.println(aeName + cntName + polygon);
-        aggregateValue.put(new Carriage(aeName, cntName),polygon);
+        aggregateValue.put(jsonObject,polygon);
         return aggregateValue;
       }
 
 
       @Override
-      public Map<Carriage, String> merge(
-              final Map<Carriage, String> aggOne,
-              final Map<Carriage, String> aggTwo
+      public Map<JSONObject, String> merge(
+              final Map<JSONObject, String> aggOne,
+              final Map<JSONObject, String> aggTwo
       ) {
         System.out.println("========== MERGE FUNCTION");
         return aggOne;
       }
 
       @Override
-      public Struct map(final Map<Carriage, String> agg) {
+      public Struct map(final Map<JSONObject, String> agg) {
         Struct result = new Struct(RETURN_SCHEMA);
         return result;
       }
