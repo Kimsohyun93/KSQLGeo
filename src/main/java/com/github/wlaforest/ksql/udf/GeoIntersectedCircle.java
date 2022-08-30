@@ -9,6 +9,23 @@ import org.apache.kafka.connect.data.Struct;
 
 import java.util.*;
 
+class Carriage{
+  private String ae;
+  private String cnt;
+
+  public Carriage(String ae, String cnt){
+    this.ae = ae;
+    this.cnt =cnt;
+  }
+
+  public String getAe(){
+    return this.ae;
+  }
+  public String getCnt(){
+    return this.cnt;
+  }
+}
+
 @UdafDescription(
         name = "intersected_circle",
         description = "UDF function to test for geometry intersection in euclidean space. geometry encoded in " +
@@ -17,23 +34,6 @@ import java.util.*;
         author = "Will LaForest"
 )
 public final class GeoIntersectedCircle {
-
-  public static class Carriage{
-        private String ae;
-        private String cnt;
-
-        public Carriage(String ae, String cnt){
-            this.ae = ae;
-            this.cnt =cnt;
-        }
-
-        public String getAe(){
-            return this.ae;
-        }
-        public String getCnt(){
-            return this.cnt;
-        }
-    }
     private static final String AE = "AE";
     private static final String CNT = "CNT";
     private static final String RESOURCE_NAME = "RESOURCE_NAME";
