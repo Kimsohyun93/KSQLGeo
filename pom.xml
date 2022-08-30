@@ -173,6 +173,11 @@
     <dependencies>
         <!-- KSQL dependencies -->
         <dependency>
+            <groupId>org.apache.kafka</groupId>
+            <artifactId>connect-api</artifactId>
+            <version>3.2.0</version>
+        </dependency>
+        <dependency>
             <groupId>io.confluent.ksql</groupId>
             <artifactId>ksql-udf</artifactId>
             <version>${ksql.version}</version>
