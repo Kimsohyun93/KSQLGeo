@@ -17,6 +17,33 @@ import java.util.*;
         author = "Will LaForest"
 )
 public final class GeoIntersectedCircle {
+    private static final String AE = "AE";
+    private static final String CNT = "CNT";
+    private static final String RESOURCE_NAME = "RESOURCE_NAME";
+    private static final String POLYGON = "POLYGON";
+    private static final String INTERSECTED = "INTERSECTED";
+
+    public static final Schema PARAM_SCHEMA = SchemaBuilder.struct().optional()
+            .field(AE, Schema.OPTIONAL_STRING_SCHEMA)
+            .field(CNT, Schema.OPTIONAL_STRING_SCHEMA)
+            .field(POLYGON, Schema.OPTIONAL_STRING_SCHEMA)
+            .build();
+
+    public static final String PARAM_SCHEMA_DESCRIPTOR = "STRUCT<" +
+            "AE STRING," +
+            "CNT STRING," +
+            "POLYGON STRING" +
+            ">";
+
+    public static final Schema RETURN_SCHEMA = SchemaBuilder.struct().optional()
+            .field(RESOURCE_NAME, Schema.OPTIONAL_STRING_SCHEMA)
+            .field(INTERSECTED,Schema.OPTIONAL_STRING_SCHEMA)
+            .build();
+
+    public static final String RETURN_SCHEMA_DESCRIPTOR = "STRUCT<" +
+            "RESOURCE_NAME STRING," +
+            "INTERSECTED STRING" +
+            ">";
 
   private GeoIntersectedCircle() {
   }
