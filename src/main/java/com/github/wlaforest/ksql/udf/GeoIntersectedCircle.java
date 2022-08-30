@@ -39,7 +39,7 @@ public final class  GeoIntersectedCircle extends GeometryBase {
   }
   private static final String AE = "AE";
   private static final String CNT = "CNT";
-  private static final String RESOURCE = "RESOURCE";
+  private static final String RESOURCE_NAME = "RESOURCE_NAME";
   private static final String POLYGON = "POLYGON";
   private static final String INTERSECTED = "INTERSECTED";
 
@@ -56,18 +56,18 @@ public final class  GeoIntersectedCircle extends GeometryBase {
           ">";
 
   public static final Schema RETURN_SCHEMA = SchemaBuilder.struct().optional()
-          .field(RESOURCE, Schema.OPTIONAL_STRING_SCHEMA)
+          .field(RESOURCE_NAME, Schema.OPTIONAL_STRING_SCHEMA)
           .field(INTERSECTED,Schema.OPTIONAL_STRING_SCHEMA)
           .build();
 
   public static final String RETURN_SCHEMA_DESCRIPTOR = "STRUCT<" +
-          "RESOURCE STRING," +
+          "RESOURCE_NAME STRING," +
           "INTERSECTED STRING" +
           ">";
   private GeoIntersectedCircle() {
   }
 
-  @UdafFactory(description = "compute the slope and find the inflection points",
+  @UdafFactory(description = "compute if polygon intersected",
           paramSchema = PARAM_SCHEMA_DESCRIPTOR,
           returnSchema = RETURN_SCHEMA_DESCRIPTOR)
   public Udaf<Struct, Map<Carriage, String>, Struct> createUdaf() {
