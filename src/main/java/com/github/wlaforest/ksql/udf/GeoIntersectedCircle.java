@@ -87,9 +87,11 @@ public final class GeoIntersectedCircle {
         final String aeName = newValue.getString(AE);
         final String cntName = newValue.getString(CNT);
         final String polygon = newValue.getString(POLYGON);
+
         JSONObject jsonObject = new JSONObject();
         jsonObject.put(AE, aeName);
         jsonObject.put(CNT, cntName);
+
         System.out.println(aeName + cntName + polygon);
         aggregateValue.put(jsonObject.toJSONString(),polygon);
         return aggregateValue;
@@ -108,6 +110,14 @@ public final class GeoIntersectedCircle {
       @Override
       public Struct map(final Map<String, String> agg) {
         Struct result = new Struct(RETURN_SCHEMA);
+
+        Map<String, String> sortedMap = new TreeMap<>(agg);
+        boolean intersect_response;
+        Map<JSONObject, ArrayList<Map<String, String>>> intersected_result = new HashMap<>();
+
+        System.out.println("========== AGG KEYSET");
+        System.out.println(sortedMap.keySet());
+
         return result;
       }
     };
