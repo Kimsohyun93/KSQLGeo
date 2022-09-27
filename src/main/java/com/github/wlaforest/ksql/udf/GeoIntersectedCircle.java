@@ -14,7 +14,9 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import com.github.wlaforest.ksql.udf.GeoIntersectedUDF.*;
 
+import javax.json.JsonObject;
 import java.util.*;
+
 
 
 @UdafDescription(
@@ -25,11 +27,34 @@ import java.util.*;
         author = "Will LaForest"
 )
 public class GeoIntersectedCircle extends GeometryBase {
+  public class Pair{
+    JSONObject key;
+    JSONArray value;
+    Pair(JSONObject key, JSONArray value){
+      this.key=key;
+      this.value=value;
+    }
+
+    public JSONArray getValue() {
+      return value;
+    }
+
+    public JSONObject getKey() {
+      return key;
+    }
+
+    public void setValue(JSONArray value) {
+      this.value = value;
+    }
+  }
     private static final String AE = "AE";
     private static final String CNT = "CNT";
     private static final String RESOURCE_NAME = "RESOURCE_NAME";
     private static final String POLYGON = "POLYGON";
     private static final String INTERSECTED = "INTERSECTED";
+
+    static JSONParser jsonParser = new JSONParser();
+    static Spatial4JHelper s4h = new Spatial4JHelper();
 
     public static final Schema PARAM_SCHEMA = SchemaBuilder.struct().optional()
             .field(AE, Schema.OPTIONAL_STRING_SCHEMA)
@@ -59,110 +84,96 @@ public class GeoIntersectedCircle extends GeometryBase {
   @UdafFactory(description = "check polygon intersected",
           paramSchema = PARAM_SCHEMA_DESCRIPTOR,
           returnSchema = RETURN_SCHEMA_DESCRIPTOR)
-  public static Udaf<Struct, Map<String, String>, Struct> createUdaf() {
+  public static Udaf<Struct,LinkedHashMap<JSONObject, JSONArray> , String> createUdaf() {
 
-    return new Udaf<Struct, Map<String, String>,Struct>() {
+    return new Udaf<Struct, LinkedHashMap<JSONObject, JSONArray> ,String>() {
 
       @Override
-      public Map<String, String> initialize() {
-        final Map<String, String> stats = new HashMap<>();
-        return stats;
+      public LinkedHashMap<JSONObject, JSONArray>  initialize() {
+//        final Map<String, String> stats = new HashMap<>();
+//        return stats;
+
+        LinkedHashMap<JSONObject, JSONArray> list = new LinkedHashMap<>();
+        return list;
       }
 
       @Override
-      public Map<String, String> aggregate(
+      public LinkedHashMap<JSONObject, JSONArray>  aggregate(
               final Struct newValue,
-              final Map<String, String> aggregateValue
+              final LinkedHashMap<JSONObject, JSONArray>  aggregateValue
       ) {
         final String aeName = newValue.getString(AE);
         final String cntName = newValue.getString(CNT);
         final String polygon = newValue.getString(POLYGON);
 
         JSONObject jsonObject = new JSONObject();
+        JSONObject valueObject = new JSONObject();
         jsonObject.put(AE, aeName);
         jsonObject.put(CNT, cntName);
+        jsonObject.put(POLYGON, polygon);
 
-        System.out.println(aeName + cntName + polygon);
-        aggregateValue.put(jsonObject.toJSONString(),polygon);
+        valueObject.put(AE, aeName);
+        valueObject.put(CNT, cntName);
+
+        JSONArray tmpValue = new JSONArray();
+        boolean intersect_response = false;
+        // aggregateValue - KEY : {AE, CNT, POLYGON} / VALUE : [{AE,CNT}(INTERSECTED JSON ARRAY)]
+
+//        System.out.println(aeName + cntName + polygon);
+        aggregateValue.put(jsonObject,new JSONArray());
+
+        for(JSONObject key : aggregateValue.keySet()){
+          if(key.get(AE).equals(aeName) && key.get(CNT).equals(cntName)){
+            continue;
+          }
+
+          try {
+            intersect_response = s4h.intersect(key.get(POLYGON).toString(), polygon);
+          } catch (GeometryParseException e) {
+            e.printStackTrace();
+          }
+
+          System.out.println("GET INTERSECTED RESPONSE : " );
+          System.out.println("NEW VALUE : {" + aeName + ", " + cntName + "} , COMPARE VALUE : {" + key.get(AE) + ", " + key.get(CNT) + "} , RESULT : " + intersect_response);
+          if(intersect_response){
+            System.out.println("THIS IS INTERSECTED");
+            tmpValue = aggregateValue.get(key);
+            tmpValue.add(valueObject);
+            aggregateValue.put(key, tmpValue);
+            tmpValue = aggregateValue.get(jsonObject);
+            tmpValue.add(key.remove(POLYGON));
+            aggregateValue.put(jsonObject, tmpValue);
+          }else{
+            System.out.println("THIS IS NOT INTERSECTED");
+
+            if(aggregateValue.get(key).contains(valueObject)){
+              tmpValue = aggregateValue.get(key);
+              tmpValue.remove(valueObject);
+              aggregateValue.put(key, tmpValue);
+              tmpValue = aggregateValue.get(jsonObject);
+              tmpValue.remove(key.remove(POLYGON));
+              aggregateValue.put(jsonObject, tmpValue);
+            }
+          }
+        }
         return aggregateValue;
       }
 
 
       @Override
-      public Map<String, String> merge(
-              final Map<String, String> aggOne,
-              final Map<String, String> aggTwo
+      public LinkedHashMap<JSONObject, JSONArray>  merge(
+              final LinkedHashMap<JSONObject, JSONArray> aggOne,
+              final LinkedHashMap<JSONObject, JSONArray> aggTwo
       ) {
         System.out.println("========== MERGE FUNCTION");
         return aggOne;
       }
 
       @Override
-      public Struct map(final Map<String, String> agg) {
-        JSONParser jsonParser = new JSONParser();
-        Struct result = new Struct(RETURN_SCHEMA);
-        Spatial4JHelper test = new Spatial4JHelper();
-
-        Map<String, String> sortedMap = new TreeMap<>(agg);
-        boolean intersect_response;
-        Map<JSONObject, JSONArray> intersected_result = new HashMap<>();
-        JSONObject key1Resource = null;
-        JSONObject key2Resource = null;
-
-
-        System.out.println("========== AGG KEYSET");
-        System.out.println(sortedMap.keySet());
-
-
-        for(String key1 : sortedMap.keySet()){
-          try {
-            Object obj = jsonParser.parse(key1);
-
-            if (obj instanceof JSONObject) {
-              key1Resource = (JSONObject)obj;
-            }
-          } catch (ParseException e) {
-            e.printStackTrace();
-          }
-
-          for(String key2 : sortedMap.keySet()){
-            try {
-              Object obj = jsonParser.parse(key2);
-
-              if (obj instanceof JSONObject) {
-                key2Resource = (JSONObject)obj;
-              }
-            } catch (ParseException e) {
-              e.printStackTrace();
-            }
-
-            try {
-              if(!Objects.equals(key1, key2)){
-                intersect_response = test.intersect(sortedMap.get(key1), sortedMap.get(key2));
-
-                if(intersect_response){
-
-                  JSONArray itstedArrlist1 = intersected_result.getOrDefault(key1Resource, new JSONArray());
-                  itstedArrlist1.add(key2Resource);
-                  intersected_result.put(key1Resource, itstedArrlist1);
-
-                  JSONArray itstedArrlist2 = intersected_result.getOrDefault(key2Resource, new JSONArray());
-                  itstedArrlist2.add(key1Resource);
-                  intersected_result.put(key2Resource, itstedArrlist2);
-                }
-              }
-            } catch (GeometryParseException e) {
-              e.printStackTrace();
-            }
-          }
-          sortedMap.remove(key1);
-//          result.put(RESOURCE, key1Resource.toString());
-//          result.put(INTERSECTED, intersected_result.get(key1Resource).toString());
-          result.put(key1Resource.toJSONString(), intersected_result.get(key1Resource).toJSONString());
-        }
-
-        System.out.println(result);
-        return result;
+      public String map(final LinkedHashMap<JSONObject, JSONArray> agg) {
+        // 내 group (AE, CNT)에 맞는 애들만 반환하고 싶은데
+        String returnValue = agg.entrySet().toArray()[agg.size() -1].toString();
+        return returnValue;
       }
     };
   }
