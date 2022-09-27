@@ -11,6 +11,7 @@ import org.apache.kafka.connect.data.Struct;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 import java.util.*;
 
@@ -60,23 +61,23 @@ public class GeoIntersectedCircle extends GeometryBase {
 
   @UdafFactory(description = "check polygon intersected",
           paramSchema = PARAM_SCHEMA_DESCRIPTOR)
-  public static Udaf<Struct,Map<JSONObject, JSONArray>, String> createUdaf() {
+  public static Udaf<Struct,LinkedHashMap<String, List<String>>, String> createUdaf() {
 
-    return new Udaf<Struct, Map<JSONObject, JSONArray>, String>() {
+    return new Udaf<Struct, LinkedHashMap<String, List<String>>, String>() {
 
       @Override
-      public Map<JSONObject, JSONArray>  initialize() {
+      public LinkedHashMap<String, List<String>>  initialize() {
 //        final Map<String, String> stats = new HashMap<>();
 //        return stats;
 
-        Map<JSONObject, JSONArray> list = new HashMap<>();
+        LinkedHashMap<String, List<String>> list = new LinkedHashMap<>();
         return list;
       }
 
       @Override
-      public Map<JSONObject, JSONArray>  aggregate(
+      public LinkedHashMap<String, List<String>>  aggregate(
               final Struct newValue,
-              final Map<JSONObject, JSONArray>  aggregateValue
+              final LinkedHashMap<String, List<String>>  aggregateValue
       ) {
         final String aeName = newValue.getString(AE);
         final String cntName = newValue.getString(CNT);
@@ -92,13 +93,21 @@ public class GeoIntersectedCircle extends GeometryBase {
         valueObject.put(CNT, cntName);
 
         JSONArray tmpValue = new JSONArray();
+        JSONObject key = new JSONObject();
         boolean intersect_response = false;
-        // aggregateValue - KEY : {AE, CNT, POLYGON} / VALUE : [{AE,CNT}(INTERSECTED JSON ARRAY)]
+
+        // aggregateValue - KEY : {AE, CNT, POLYGON} / VALUE : [{AE,CNT}(INTERSECTED ARRAY)]
 
 //        System.out.println(aeName + cntName + polygon);
-        aggregateValue.put(jsonObject,new JSONArray());
+        List<String> li = new ArrayList<>();
+        aggregateValue.put(jsonObject.toJSONString(),li);
 
-        for(JSONObject key : aggregateValue.keySet()){
+        for(String tmpKey : aggregateValue.keySet()){
+          try {
+            key = (JSONObject) jsonParser.parse(tmpKey);
+          } catch (ParseException e) {
+            e.printStackTrace();
+          }
           if(key.get(AE).equals(aeName) && key.get(CNT).equals(cntName)){
             continue;
           }
@@ -113,22 +122,34 @@ public class GeoIntersectedCircle extends GeometryBase {
           System.out.println("NEW VALUE : {" + aeName + ", " + cntName + "} , COMPARE VALUE : {" + key.get(AE) + ", " + key.get(CNT) + "} , RESULT : " + intersect_response);
           if(intersect_response){
             System.out.println("THIS IS INTERSECTED");
-            tmpValue = aggregateValue.get(key);
-            tmpValue.add(valueObject);
-            aggregateValue.put(key, tmpValue);
-            tmpValue = aggregateValue.get(jsonObject);
-            tmpValue.add(key.remove(POLYGON));
-            aggregateValue.put(jsonObject, tmpValue);
+            li = aggregateValue.get(tmpKey);
+            li.add(valueObject.toJSONString());
+            aggregateValue.put(tmpKey, li);
+//            tmpValue = new JSONArray(aggregateValue.get(key));
+//            tmpValue.add(valueObject);
+//            aggregateValue.put(key.toJSONString(), tmpValue.toJSONString());
+            li = aggregateValue.get(jsonObject.toJSONString());
+            li.add(key.remove(POLYGON).toString());
+            aggregateValue.put(jsonObject.toJSONString(), li);
+//            tmpValue = aggregateValue.get(jsonObject);
+//            tmpValue.add(key.remove(POLYGON));
+//            aggregateValue.put(jsonObject.toJSONString(), tmpValue.toJSONString());
           }else{
             System.out.println("THIS IS NOT INTERSECTED");
 
-            if(aggregateValue.get(key).contains(valueObject)){
-              tmpValue = aggregateValue.get(key);
-              tmpValue.remove(valueObject);
-              aggregateValue.put(key, tmpValue);
-              tmpValue = aggregateValue.get(jsonObject);
-              tmpValue.remove(key.remove(POLYGON));
-              aggregateValue.put(jsonObject, tmpValue);
+            if(aggregateValue.get(tmpKey).contains(valueObject.toString())){
+              li = aggregateValue.get(tmpKey);
+              li.remove(valueObject.toJSONString());
+              aggregateValue.put(tmpKey, li);
+//              tmpValue = aggregateValue.get(key);
+//              tmpValue.remove(valueObject);
+//              aggregateValue.put(key, tmpValue);
+              li = aggregateValue.get(jsonObject.toJSONString());
+              li.remove(key.remove(POLYGON).toString());
+              aggregateValue.put(tmpKey, li);
+//              tmpValue = aggregateValue.get(jsonObject);
+//              tmpValue.remove(key.remove(POLYGON));
+//              aggregateValue.put(jsonObject, tmpValue);
             }
           }
         }
@@ -137,19 +158,18 @@ public class GeoIntersectedCircle extends GeometryBase {
 
 
       @Override
-      public Map<JSONObject, JSONArray>  merge(
-              final Map<JSONObject, JSONArray> aggOne,
-              final Map<JSONObject, JSONArray> aggTwo
+      public LinkedHashMap<String, List<String>>  merge(
+              final LinkedHashMap<String, List<String>> aggOne,
+              final LinkedHashMap<String, List<String>> aggTwo
       ) {
         System.out.println("========== MERGE FUNCTION");
         return aggOne;
       }
 
       @Override
-      public String map(final Map<JSONObject, JSONArray> agg) {
+      public String map(final LinkedHashMap<String, List<String>> agg) {
         // 내 group (AE, CNT)에 맞는 애들만 반환하고 싶은데
-        String returnValue = agg.entrySet().toArray()[agg.size() -1].toString();
-        return returnValue;
+        return agg.entrySet().toArray()[agg.size() -1].toString();
       }
     };
   }
