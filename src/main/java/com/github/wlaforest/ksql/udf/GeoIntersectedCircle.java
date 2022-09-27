@@ -11,10 +11,7 @@ import org.apache.kafka.connect.data.Struct;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
-import com.github.wlaforest.ksql.udf.GeoIntersectedUDF.*;
 
-import javax.json.JsonObject;
 import java.util.*;
 
 
@@ -27,26 +24,6 @@ import java.util.*;
         author = "Will LaForest"
 )
 public class GeoIntersectedCircle extends GeometryBase {
-  public class Pair{
-    JSONObject key;
-    JSONArray value;
-    Pair(JSONObject key, JSONArray value){
-      this.key=key;
-      this.value=value;
-    }
-
-    public JSONArray getValue() {
-      return value;
-    }
-
-    public JSONObject getKey() {
-      return key;
-    }
-
-    public void setValue(JSONArray value) {
-      this.value = value;
-    }
-  }
     private static final String AE = "AE";
     private static final String CNT = "CNT";
     private static final String RESOURCE_NAME = "RESOURCE_NAME";
@@ -82,25 +59,24 @@ public class GeoIntersectedCircle extends GeometryBase {
   }
 
   @UdafFactory(description = "check polygon intersected",
-          paramSchema = PARAM_SCHEMA_DESCRIPTOR,
-          returnSchema = RETURN_SCHEMA_DESCRIPTOR)
-  public static Udaf<Struct,LinkedHashMap<JSONObject, JSONArray> , String> createUdaf() {
+          paramSchema = PARAM_SCHEMA_DESCRIPTOR)
+  public static Udaf<Struct,Map<JSONObject, JSONArray>, String> createUdaf() {
 
-    return new Udaf<Struct, LinkedHashMap<JSONObject, JSONArray> ,String>() {
+    return new Udaf<Struct, Map<JSONObject, JSONArray>, String>() {
 
       @Override
-      public LinkedHashMap<JSONObject, JSONArray>  initialize() {
+      public Map<JSONObject, JSONArray>  initialize() {
 //        final Map<String, String> stats = new HashMap<>();
 //        return stats;
 
-        LinkedHashMap<JSONObject, JSONArray> list = new LinkedHashMap<>();
+        Map<JSONObject, JSONArray> list = new Map<>();
         return list;
       }
 
       @Override
-      public LinkedHashMap<JSONObject, JSONArray>  aggregate(
+      public Map<JSONObject, JSONArray>  aggregate(
               final Struct newValue,
-              final LinkedHashMap<JSONObject, JSONArray>  aggregateValue
+              final Map<JSONObject, JSONArray>  aggregateValue
       ) {
         final String aeName = newValue.getString(AE);
         final String cntName = newValue.getString(CNT);
@@ -161,16 +137,16 @@ public class GeoIntersectedCircle extends GeometryBase {
 
 
       @Override
-      public LinkedHashMap<JSONObject, JSONArray>  merge(
-              final LinkedHashMap<JSONObject, JSONArray> aggOne,
-              final LinkedHashMap<JSONObject, JSONArray> aggTwo
+      public Map<JSONObject, JSONArray>  merge(
+              final Map<JSONObject, JSONArray> aggOne,
+              final Map<JSONObject, JSONArray> aggTwo
       ) {
         System.out.println("========== MERGE FUNCTION");
         return aggOne;
       }
 
       @Override
-      public String map(final LinkedHashMap<JSONObject, JSONArray> agg) {
+      public String map(final Map<JSONObject, JSONArray> agg) {
         // 내 group (AE, CNT)에 맞는 애들만 반환하고 싶은데
         String returnValue = agg.entrySet().toArray()[agg.size() -1].toString();
         return returnValue;
