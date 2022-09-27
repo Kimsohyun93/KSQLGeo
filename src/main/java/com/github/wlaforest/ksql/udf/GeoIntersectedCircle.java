@@ -69,7 +69,7 @@ public class GeoIntersectedCircle extends GeometryBase {
 //        final Map<String, String> stats = new HashMap<>();
 //        return stats;
 
-        Map<JSONObject, JSONArray> list = new Map<>();
+        Map<JSONObject, JSONArray> list = new HashMap<>();
         return list;
       }
 
