@@ -61,23 +61,23 @@ public class GeoIntersectedCircle extends GeometryBase {
 
   @UdafFactory(description = "check polygon intersected",
           paramSchema = PARAM_SCHEMA_DESCRIPTOR)
-  public static Udaf<Struct,LinkedHashMap<String, List<String>>, String> createUdaf() {
+  public static Udaf<Struct,LinkedHashMap<String, String>, String> createUdaf() {
 
-    return new Udaf<Struct, LinkedHashMap<String, List<String>>, String>() {
+    return new Udaf<Struct, LinkedHashMap<String, String>, String>() {
 
       @Override
-      public LinkedHashMap<String, List<String>>  initialize() {
+      public LinkedHashMap<String, String>  initialize() {
 //        final Map<String, String> stats = new HashMap<>();
 //        return stats;
 
-        LinkedHashMap<String, List<String>> list = new LinkedHashMap<>();
+        LinkedHashMap<String, String> list = new LinkedHashMap<>();
         return list;
       }
 
       @Override
-      public LinkedHashMap<String, List<String>>  aggregate(
+      public LinkedHashMap<String, String>  aggregate(
               final Struct newValue,
-              final LinkedHashMap<String, List<String>>  aggregateValue
+              final LinkedHashMap<String, String>  aggregateValue
       ) {
         final String aeName = newValue.getString(AE);
         final String cntName = newValue.getString(CNT);
@@ -100,75 +100,76 @@ public class GeoIntersectedCircle extends GeometryBase {
 
 //        System.out.println(aeName + cntName + polygon);
         List<String> li = new ArrayList<>();
-        aggregateValue.put(jsonObject.toJSONString(),li);
+        aggregateValue.put(jsonObject.toJSONString(),"");
 
-        for(String tmpKey : aggregateValue.keySet()){
-          try {
-            key = (JSONObject) jsonParser.parse(tmpKey);
-          } catch (ParseException e) {
-            e.printStackTrace();
-          }
-          if(key.get(AE).equals(aeName) && key.get(CNT).equals(cntName)){
-            continue;
-          }
-
-          try {
-            intersect_response = s4h.intersect(key.get(POLYGON).toString(), polygon);
-          } catch (GeometryParseException e) {
-            e.printStackTrace();
-          }
-
-          System.out.println("GET INTERSECTED RESPONSE : " );
-          System.out.println("NEW VALUE : {" + aeName + ", " + cntName + "} , COMPARE VALUE : {" + key.get(AE) + ", " + key.get(CNT) + "} , RESULT : " + intersect_response);
-          if(intersect_response){
-            System.out.println("THIS IS INTERSECTED");
-            li = aggregateValue.get(tmpKey);
-            li.add(valueObject.toJSONString());
-            aggregateValue.put(tmpKey, li);
-//            tmpValue = new JSONArray(aggregateValue.get(key));
-//            tmpValue.add(valueObject);
-//            aggregateValue.put(key.toJSONString(), tmpValue.toJSONString());
-            li = aggregateValue.get(jsonObject.toJSONString());
-            li.add(key.remove(POLYGON).toString());
-            aggregateValue.put(jsonObject.toJSONString(), li);
-//            tmpValue = aggregateValue.get(jsonObject);
-//            tmpValue.add(key.remove(POLYGON));
-//            aggregateValue.put(jsonObject.toJSONString(), tmpValue.toJSONString());
-          }else{
-            System.out.println("THIS IS NOT INTERSECTED");
-
-            if(aggregateValue.get(tmpKey).contains(valueObject.toString())){
-              li = aggregateValue.get(tmpKey);
-              li.remove(valueObject.toJSONString());
-              aggregateValue.put(tmpKey, li);
-//              tmpValue = aggregateValue.get(key);
-//              tmpValue.remove(valueObject);
-//              aggregateValue.put(key, tmpValue);
-              li = aggregateValue.get(jsonObject.toJSONString());
-              li.remove(key.remove(POLYGON).toString());
-              aggregateValue.put(tmpKey, li);
-//              tmpValue = aggregateValue.get(jsonObject);
-//              tmpValue.remove(key.remove(POLYGON));
-//              aggregateValue.put(jsonObject, tmpValue);
-            }
-          }
-        }
+//        for(String tmpKey : aggregateValue.keySet()){
+//          try {
+//            key = (JSONObject) jsonParser.parse(tmpKey);
+//          } catch (ParseException e) {
+//            e.printStackTrace();
+//          }
+//          if(key.get(AE).equals(aeName) && key.get(CNT).equals(cntName)){
+//            continue;
+//          }
+//
+//          try {
+//            intersect_response = s4h.intersect(key.get(POLYGON).toString(), polygon);
+//          } catch (GeometryParseException e) {
+//            e.printStackTrace();
+//          }
+//
+//          System.out.println("GET INTERSECTED RESPONSE : " );
+//          System.out.println("NEW VALUE : {" + aeName + ", " + cntName + "} , COMPARE VALUE : {" + key.get(AE) + ", " + key.get(CNT) + "} , RESULT : " + intersect_response);
+//          if(intersect_response){
+//            System.out.println("THIS IS INTERSECTED");
+//            li = aggregateValue.get(tmpKey);
+//            li.add(valueObject.toJSONString());
+//            aggregateValue.put(tmpKey, li);
+////            tmpValue = new JSONArray(aggregateValue.get(key));
+////            tmpValue.add(valueObject);
+////            aggregateValue.put(key.toJSONString(), tmpValue.toJSONString());
+//            li = aggregateValue.get(jsonObject.toJSONString());
+//            li.add(key.remove(POLYGON).toString());
+//            aggregateValue.put(jsonObject.toJSONString(), li);
+////            tmpValue = aggregateValue.get(jsonObject);
+////            tmpValue.add(key.remove(POLYGON));
+////            aggregateValue.put(jsonObject.toJSONString(), tmpValue.toJSONString());
+//          }else{
+//            System.out.println("THIS IS NOT INTERSECTED");
+//
+//            if(aggregateValue.get(tmpKey).contains(valueObject.toString())){
+//              li = aggregateValue.get(tmpKey);
+//              li.remove(valueObject.toJSONString());
+//              aggregateValue.put(tmpKey, li);
+////              tmpValue = aggregateValue.get(key);
+////              tmpValue.remove(valueObject);
+////              aggregateValue.put(key, tmpValue);
+//              li = aggregateValue.get(jsonObject.toJSONString());
+//              li.remove(key.remove(POLYGON).toString());
+//              aggregateValue.put(tmpKey, li);
+////              tmpValue = aggregateValue.get(jsonObject);
+////              tmpValue.remove(key.remove(POLYGON));
+////              aggregateValue.put(jsonObject, tmpValue);
+//            }
+//          }
+//        }
         return aggregateValue;
       }
 
 
       @Override
-      public LinkedHashMap<String, List<String>>  merge(
-              final LinkedHashMap<String, List<String>> aggOne,
-              final LinkedHashMap<String, List<String>> aggTwo
+      public LinkedHashMap<String, String>  merge(
+              final LinkedHashMap<String, String> aggOne,
+              final LinkedHashMap<String, String> aggTwo
       ) {
         System.out.println("========== MERGE FUNCTION");
         return aggOne;
       }
 
       @Override
-      public String map(final LinkedHashMap<String, List<String>> agg) {
+      public String map(final LinkedHashMap<String, String> agg) {
         // 내 group (AE, CNT)에 맞는 애들만 반환하고 싶은데
+
         return agg.entrySet().toArray()[agg.size() -1].toString();
       }
     };
