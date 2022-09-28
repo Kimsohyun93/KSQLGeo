@@ -138,6 +138,7 @@ public class GeoIntersectedCircle extends GeometryBase {
 
           }else{
             System.out.println("THIS IS NOT INTERSECTED");
+            System.out.println("THIS IS CONTAINES RESULT : " + aggregateValue.get(tmpKey).contains(valueObject.toJSONString()));
             if(aggregateValue.get(tmpKey).contains(valueObject.toJSONString())){
               li = aggregateValue.get(tmpKey);
               li.remove(valueObject.toJSONString());
