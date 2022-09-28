@@ -100,7 +100,7 @@ public class GeoIntersectedCircle extends GeometryBase {
         aggregateValue.put(jsonObject.toJSONString(),li);
 
         for(String tmpKey : aggregateValue.keySet()){
-
+          System.out.println("AGGREAGATION VALUE" + aggregateValue.get(tmpKey));
           // Map<String, String>으로 저장되어 있는 key를 JSONObject로 변환시킴
           try {
             key = (JSONObject) jsonParser.parse(tmpKey);
