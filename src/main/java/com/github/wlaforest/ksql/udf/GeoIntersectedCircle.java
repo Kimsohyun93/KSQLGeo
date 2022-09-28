@@ -97,7 +97,7 @@ public class GeoIntersectedCircle extends GeometryBase {
         String[] arr = {};
         // aggregateValue - KEY : {AE, CNT, POLYGON} / VALUE : [{AE,CNT}(INTERSECTED ARRAY)]
 
-        aggregateValue.put(jsonObject.toJSONString(),arr);
+        aggregateValue.put(jsonObject.toJSONString(),li);
 
 //        for(String tmpKey : aggregateValue.keySet()){
 //
