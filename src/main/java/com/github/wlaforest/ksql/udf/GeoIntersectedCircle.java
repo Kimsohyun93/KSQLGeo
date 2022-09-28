@@ -128,9 +128,15 @@ public class GeoIntersectedCircle extends GeometryBase {
           // Intersect 결과에 따라 두 Value에 {AE,CNT} 쌍을 입력할지, 삭제할지 결정
           if(intersect_response){
             System.out.println("THIS IS INTERSECTED");
-            li = aggregateValue.get(tmpKey);
-            li.add(valueObject.toJSONString());
-            aggregateValue.put(tmpKey, li);
+            System.out.println("THIS IS VALUE OBJECT : " + valueObject);
+
+
+            if(!aggregateValue.get(tmpKey).contains(valueObject.toJSONString())) {
+              li = aggregateValue.get(tmpKey);
+              li.add(valueObject.toJSONString());
+              System.out.println("THIS IS LI : " + li);
+              aggregateValue.put(tmpKey, li);
+            }
 
             li = aggregateValue.get(jsonObject.toJSONString());
             li.add(key.remove(POLYGON).toString());
