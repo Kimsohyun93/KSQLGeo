@@ -68,7 +68,7 @@ public class GeoIntersectedCircle extends GeometryBase {
       @Override
       public Map<String, String[]> initialize() {
 //        Map<Object, Object> list = new LinkedHashMap<>();
-
+        System.out.println("THIS IS INITIALIZE");
         return new LinkedHashMap<>();
       }
 
@@ -80,7 +80,7 @@ public class GeoIntersectedCircle extends GeometryBase {
         final String aeName = newValue.getString(AE);
         final String cntName = newValue.getString(CNT);
         final String polygon = newValue.getString(POLYGON);
-
+        System.out.println("THIS IS AGGREGATE : " + aeName +" " + cntName + " " + polygon);
         JSONObject jsonObject = new JSONObject();
         JSONObject valueObject = new JSONObject();
         jsonObject.put(AE, aeName);
