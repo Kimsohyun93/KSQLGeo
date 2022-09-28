@@ -166,6 +166,7 @@ public class GeoIntersectedCircle extends GeometryBase {
       public Map<String, List<String>> map(final Map<String, List<String>> agg) {
         // 내 group (AE, CNT)에 맞는 애들만 반환하고 싶은데
 
+        System.out.println("THIS IS MAP : " + agg);
         Map<String, List<String>> returnAgg = new LinkedHashMap<>();
         JSONObject returnKey = new JSONObject();
         for(String key : agg.keySet()){
