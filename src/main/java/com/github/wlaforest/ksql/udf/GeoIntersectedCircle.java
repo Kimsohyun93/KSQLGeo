@@ -132,14 +132,13 @@ public class GeoIntersectedCircle extends GeometryBase {
 
             System.out.println("중복체크 : " + !aggregateValue.get(tmpKey).contains(valueObject.toJSONString()));
             if(!aggregateValue.get(tmpKey).contains(valueObject.toJSONString())) {
-              li = new ArrayList<>();
               li = aggregateValue.get(tmpKey);
+              System.out.println("THIS IS LI## : " + li);
               li.add(valueObject.toJSONString());
-              System.out.println("THIS IS LI : " + li);
+              System.out.println("THIS IS LI#### : " + li);
               aggregateValue.put(tmpKey, li);
             }
 
-            li = new ArrayList<>();
             li = aggregateValue.get(jsonObject.toJSONString());
             li.add(key.remove(POLYGON).toString());
             aggregateValue.put(jsonObject.toJSONString(), li);
@@ -175,7 +174,7 @@ public class GeoIntersectedCircle extends GeometryBase {
       public Map<String, List<String>> map(final Map<String, List<String>> agg) {
         // 내 group (AE, CNT)에 맞는 애들만 반환하고 싶은데
 
-        System.out.println("THIS IS MAP : " + agg);
+//        System.out.println("THIS IS MAP : " + agg);
         Map<String, List<String>> returnAgg = new LinkedHashMap<>();
         JSONObject returnKey = new JSONObject();
         for(String key : agg.keySet()){
