@@ -68,8 +68,8 @@ public class GeoIntersectedCircle extends GeometryBase {
       @Override
       public Map<String, String[]> initialize() {
 //        Map<Object, Object> list = new LinkedHashMap<>();
-        Map<String, String[]> list = new LinkedHashMap<>();
-        return list;
+
+        return new LinkedHashMap<>();
       }
 
       @Override
