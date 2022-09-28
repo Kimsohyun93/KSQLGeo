@@ -61,23 +61,20 @@ public class GeoIntersectedCircle extends GeometryBase {
 
   @UdafFactory(description = "check polygon intersected",
           paramSchema = PARAM_SCHEMA_DESCRIPTOR)
-  public static Udaf<Struct,LinkedHashMap<String, String>, String> createUdaf() {
+  public static Udaf<Struct,Map<Object, Object>, String> createUdaf() {
 
-    return new Udaf<Struct, LinkedHashMap<String, String>, String>() {
+    return new Udaf<Struct,Map<Object, Object>, String>() {
 
       @Override
-      public LinkedHashMap<String, String>  initialize() {
-//        final Map<String, String> stats = new HashMap<>();
-//        return stats;
-
-        LinkedHashMap<String, String> list = new LinkedHashMap<>();
+      public Map<Object, Object> initialize() {
+        Map<Object, Object> list = new LinkedHashMap<>();
         return list;
       }
 
       @Override
-      public LinkedHashMap<String, String>  aggregate(
+      public Map<Object, Object>  aggregate(
               final Struct newValue,
-              final LinkedHashMap<String, String>  aggregateValue
+              final Map<Object, Object> aggregateValue
       ) {
         final String aeName = newValue.getString(AE);
         final String cntName = newValue.getString(CNT);
@@ -95,13 +92,13 @@ public class GeoIntersectedCircle extends GeometryBase {
         JSONArray tmpValue = new JSONArray();
         JSONObject key = new JSONObject();
         boolean intersect_response = false;
-
-        // aggregateValue - KEY : {AE, CNT, POLYGON} / VALUE : [{AE,CNT}(INTERSECTED ARRAY)]
-
-//        System.out.println(aeName + cntName + polygon);
-        List<String> li = new ArrayList<>();
-        aggregateValue.put(jsonObject.toJSONString(),"");
-
+//
+//        // aggregateValue - KEY : {AE, CNT, POLYGON} / VALUE : [{AE,CNT}(INTERSECTED ARRAY)]
+//
+////        System.out.println(aeName + cntName + polygon);
+//        List<String> li = new ArrayList<>();
+//        aggregateValue.put(jsonObject.toJSONString(),"");
+//
 //        for(String tmpKey : aggregateValue.keySet()){
 //          try {
 //            key = (JSONObject) jsonParser.parse(tmpKey);
@@ -158,16 +155,16 @@ public class GeoIntersectedCircle extends GeometryBase {
 
 
       @Override
-      public LinkedHashMap<String, String>  merge(
-              final LinkedHashMap<String, String> aggOne,
-              final LinkedHashMap<String, String> aggTwo
+      public Map<Object, Object>  merge(
+              final Map<Object, Object> aggOne,
+              final Map<Object, Object> aggTwo
       ) {
         System.out.println("========== MERGE FUNCTION");
         return aggOne;
       }
 
       @Override
-      public String map(final LinkedHashMap<String, String> agg) {
+      public String map(final Map<Object, Object> agg) {
         // 내 group (AE, CNT)에 맞는 애들만 반환하고 싶은데
 
         return agg.entrySet().toArray()[agg.size() -1].toString();
