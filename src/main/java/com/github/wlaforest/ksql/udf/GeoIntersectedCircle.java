@@ -68,7 +68,7 @@ public class GeoIntersectedCircle extends GeometryBase {
       @Override
       public Map<String, List<String>> initialize() {
 //        Map<Object, Object> list = new LinkedHashMap<>();
-        System.out.println("THIS IS INITIALIZE");
+//        System.out.println("THIS IS INITIALIZE");
         return new LinkedHashMap<>();
       }
 
@@ -80,7 +80,7 @@ public class GeoIntersectedCircle extends GeometryBase {
         final String aeName = newValue.getString(AE);
         final String cntName = newValue.getString(CNT);
         final String polygon = newValue.getString(POLYGON);
-        System.out.println("THIS IS AGGREGATE : " + aeName +" " + cntName + " " + polygon);
+        System.out.println("THIS IS AGGREGATE : " + aeName +" " + cntName);
         JSONObject jsonObject = new JSONObject();
         JSONObject valueObject = new JSONObject();
         jsonObject.put(AE, aeName);
@@ -130,14 +130,16 @@ public class GeoIntersectedCircle extends GeometryBase {
             System.out.println("THIS IS INTERSECTED");
             System.out.println("THIS IS VALUE OBJECT : " + valueObject);
 
-
+            System.out.println("중복체크 : " + !aggregateValue.get(tmpKey).contains(valueObject.toJSONString()));
             if(!aggregateValue.get(tmpKey).contains(valueObject.toJSONString())) {
+              li = new ArrayList<>();
               li = aggregateValue.get(tmpKey);
               li.add(valueObject.toJSONString());
               System.out.println("THIS IS LI : " + li);
               aggregateValue.put(tmpKey, li);
             }
 
+            li = new ArrayList<>();
             li = aggregateValue.get(jsonObject.toJSONString());
             li.add(key.remove(POLYGON).toString());
             aggregateValue.put(jsonObject.toJSONString(), li);
