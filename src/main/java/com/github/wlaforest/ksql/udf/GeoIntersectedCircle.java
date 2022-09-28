@@ -99,71 +99,56 @@ public class GeoIntersectedCircle extends GeometryBase {
 
         aggregateValue.put(jsonObject.toJSONString(),li);
 
-//        for(String tmpKey : aggregateValue.keySet()){
-//
-//          // Map<String, String>으로 저장되어 있는 key를 JSONObject로 변환시킴
-//          try {
-//            key = (JSONObject) jsonParser.parse(tmpKey);
-//          } catch (ParseException e) {
-//            e.printStackTrace();
-//          }
-//
-//          // newValue와 aggregateValue 의 AE,CNT 값이 같으면 continue
-//          if(key.get(AE).equals(aeName) && key.get(CNT).equals(cntName)){
-//            continue;
-//          }
-//
-//          // 두 폴리건 사이의 Intersect를 구함 (Boolean)
-//          try {
-//            intersect_response = s4h.intersect(key.get(POLYGON).toString(), polygon);
-//          } catch (GeometryParseException e) {
-//            e.printStackTrace();
-//          }
-//
-//          System.out.println("GET INTERSECTED RESPONSE : " );
-//          System.out.println("NEW VALUE : {" + aeName + ", " + cntName + "} , COMPARE VALUE : {" + key.get(AE) + ", " + key.get(CNT) + "} , RESULT : " + intersect_response);
-//
-//
-//
-//          // Intersect 결과에 따라 두 Value에 {AE,CNT} 쌍을 입력할지, 삭제할지 결정
-//          if(intersect_response){
-//            System.out.println("THIS IS INTERSECTED");
-////            tmpValue = new JSONObject(aggregateValue.get(key));
-////              value = (JSONObject) jsonParser.parse(aggregateValue.get(tmpKey));
-////            tmpValue.add(valueObject);
-////            aggregateValue.put(key.toJSONString(), tmpValue.toJSONString());
-//
-//            li = Arrays.asList(aggregateValue.get(tmpKey));
-//            li.add(valueObject.toJSONString());
-//            aggregateValue.put(tmpKey, li.toArray(new String[li.size()]));
-//
-//            li = Arrays.asList(aggregateValue.get(jsonObject.toJSONString()));
-//            li.add(key.remove(POLYGON).toString());
-//            aggregateValue.put(jsonObject.toJSONString(), li.toArray(new String[li.size()]));
-//
-//          }else{
-//            System.out.println("THIS IS NOT INTERSECTED");
-//            if(Arrays.asList(aggregateValue.get(tmpKey)).contains(valueObject.toJSONString())){
-//
-////            if(aggregateValue.get(tmpKey).contains(valueObject.toString())){
-//
-//              li = Arrays.asList(aggregateValue.get(tmpKey));
-//              li.remove(valueObject.toJSONString());
-//              aggregateValue.put(tmpKey, li.toArray(new String[li.size()]));
-//
-//              li = Arrays.asList(aggregateValue.get(jsonObject.toJSONString()));
-//              li.remove(key.remove(POLYGON).toString());
-//              aggregateValue.put(jsonObject.toJSONString(), li.toArray(new String[li.size()]));
-//
-////              tmpValue = aggregateValue.get(key);
-////              tmpValue.remove(valueObject);
-////              aggregateValue.put(key, tmpValue);
-////              tmpValue = aggregateValue.get(jsonObject);
-////              tmpValue.remove(key.remove(POLYGON));
-////              aggregateValue.put(jsonObject, tmpValue);
-//            }
-//          }
-//        }
+        for(String tmpKey : aggregateValue.keySet()){
+
+          // Map<String, String>으로 저장되어 있는 key를 JSONObject로 변환시킴
+          try {
+            key = (JSONObject) jsonParser.parse(tmpKey);
+          } catch (ParseException e) {
+            e.printStackTrace();
+          }
+
+          // newValue와 aggregateValue 의 AE,CNT 값이 같으면 continue
+          if(key.get(AE).equals(aeName) && key.get(CNT).equals(cntName)){
+            continue;
+          }
+
+          // 두 폴리건 사이의 Intersect를 구함 (Boolean)
+          try {
+            intersect_response = s4h.intersect(key.get(POLYGON).toString(), polygon);
+          } catch (GeometryParseException e) {
+            e.printStackTrace();
+          }
+
+          System.out.println("GET INTERSECTED RESPONSE : " );
+          System.out.println("NEW VALUE : {" + aeName + ", " + cntName + "} , COMPARE VALUE : {" + key.get(AE) + ", " + key.get(CNT) + "} , RESULT : " + intersect_response);
+
+
+
+          // Intersect 결과에 따라 두 Value에 {AE,CNT} 쌍을 입력할지, 삭제할지 결정
+          if(intersect_response){
+            System.out.println("THIS IS INTERSECTED");
+            li = aggregateValue.get(tmpKey);
+            li.add(valueObject.toJSONString());
+            aggregateValue.put(tmpKey, li);
+
+            li = aggregateValue.get(jsonObject.toJSONString());
+            li.add(key.remove(POLYGON).toString());
+            aggregateValue.put(jsonObject.toJSONString(), li);
+
+          }else{
+            System.out.println("THIS IS NOT INTERSECTED");
+            if(aggregateValue.get(tmpKey).contains(valueObject.toJSONString())){
+              li = aggregateValue.get(tmpKey);
+              li.remove(valueObject.toJSONString());
+              aggregateValue.put(tmpKey, li);
+
+              li = aggregateValue.get(jsonObject.toJSONString());
+              li.remove(key.remove(POLYGON).toString());
+              aggregateValue.put(jsonObject.toJSONString(), li);
+            }
+          }
+        }
         return aggregateValue;
       }
 
@@ -181,7 +166,19 @@ public class GeoIntersectedCircle extends GeometryBase {
       public Map<String, List<String>> map(final Map<String, List<String>> agg) {
         // 내 group (AE, CNT)에 맞는 애들만 반환하고 싶은데
 
-        return agg;
+        Map<String, List<String>> returnAgg = new LinkedHashMap<>();
+        JSONObject returnKey = new JSONObject();
+        for(String key : agg.keySet()){
+          try {
+            returnKey = (JSONObject) jsonParser.parse(key);
+          } catch (ParseException e) {
+            e.printStackTrace();
+          }
+          returnKey.remove(POLYGON);
+          returnAgg.put(returnKey.toJSONString(), agg.get(key));
+        }
+
+        return returnAgg;
       }
     };
   }
