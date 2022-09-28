@@ -61,20 +61,22 @@ public class GeoIntersectedCircle extends GeometryBase {
 
   @UdafFactory(description = "check polygon intersected",
           paramSchema = PARAM_SCHEMA_DESCRIPTOR)
-  public static Udaf<Struct,Map<Object, Object>, String> createUdaf() {
+  public static Udaf<Struct,Map<JSONObject, JSONObject>, String> createUdaf() {
 
-    return new Udaf<Struct,Map<Object, Object>, String>() {
+    return new Udaf<Struct,Map<JSONObject, JSONObject>, String>() {
 
       @Override
-      public Map<Object, Object> initialize() {
-        Map<Object, Object> list = new LinkedHashMap<>();
+      public Map<JSONObject, JSONObject> initialize() {
+//        Map<Object, Object> list = new LinkedHashMap<>();
+        Map<JSONObject, JSONObject> list = new LinkedHashMap<>();
+
         return list;
       }
 
       @Override
-      public Map<Object, Object>  aggregate(
+      public Map<JSONObject, JSONObject> aggregate(
               final Struct newValue,
-              final Map<Object, Object> aggregateValue
+              final Map<JSONObject, JSONObject> aggregateValue
       ) {
         final String aeName = newValue.getString(AE);
         final String cntName = newValue.getString(CNT);
@@ -155,16 +157,16 @@ public class GeoIntersectedCircle extends GeometryBase {
 
 
       @Override
-      public Map<Object, Object>  merge(
-              final Map<Object, Object> aggOne,
-              final Map<Object, Object> aggTwo
+      public Map<JSONObject, JSONObject>  merge(
+              final Map<JSONObject, JSONObject> aggOne,
+              final Map<JSONObject, JSONObject> aggTwo
       ) {
         System.out.println("========== MERGE FUNCTION");
         return aggOne;
       }
 
       @Override
-      public String map(final Map<Object, Object> agg) {
+      public String map(final Map<JSONObject, JSONObject> agg) {
         // 내 group (AE, CNT)에 맞는 애들만 반환하고 싶은데
 
         return agg.entrySet().toArray()[agg.size() -1].toString();
