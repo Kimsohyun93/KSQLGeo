@@ -120,22 +120,22 @@ public class GeoIntersectedCircle extends GeometryBase {
             e.printStackTrace();
           }
 
-          System.out.println("GET INTERSECTED RESPONSE : " );
-          System.out.println("NEW VALUE : {" + aeName + ", " + cntName + "} , COMPARE VALUE : {" + key.get(AE) + ", " + key.get(CNT) + "} , RESULT : " + intersect_response);
+          System.out.println(aeName + " " + cntName + " - " +  "GET INTERSECTED RESPONSE : " );
+          System.out.println(aeName + " " + cntName + " - " +  "NEW VALUE : {" + aeName + ", " + cntName + "} , COMPARE VALUE : {" + key.get(AE) + ", " + key.get(CNT) + "} , RESULT : " + intersect_response);
 
 
 
           // Intersect 결과에 따라 두 Value에 {AE,CNT} 쌍을 입력할지, 삭제할지 결정
           if(intersect_response){
-            System.out.println("THIS IS INTERSECTED");
-            System.out.println("THIS IS VALUE OBJECT : " + valueObject);
+            System.out.println(aeName + " " + cntName + " - " +  "THIS IS INTERSECTED");
+            System.out.println(aeName + " " + cntName + " - " +  "THIS IS VALUE OBJECT : " + valueObject);
 
-            System.out.println("중복체크 : " + !aggregateValue.get(tmpKey).contains(valueObject.toJSONString()));
+            System.out.println("중복체크 : " + aggregateValue.get(tmpKey).contains(valueObject.toJSONString()));
             if(!aggregateValue.get(tmpKey).contains(valueObject.toJSONString())) {
               li = aggregateValue.get(tmpKey);
-              System.out.println("THIS IS LI## : " + li);
+              System.out.println(aeName + " " + cntName + " - " +  "THIS IS LI## : " + li);
               li.add(valueObject.toJSONString());
-              System.out.println("THIS IS LI#### : " + li);
+              System.out.println(aeName + " " + cntName + " - " +  "THIS IS LI#### : " + li);
               aggregateValue.put(tmpKey, li);
             }
 
@@ -144,13 +144,13 @@ public class GeoIntersectedCircle extends GeometryBase {
             aggregateValue.put(jsonObject.toJSONString(), li);
 
           }else{
-            System.out.println("THIS IS NOT INTERSECTED");
-            System.out.println("THIS IS CONTAINES RESULT : " + aggregateValue.get(tmpKey).contains(valueObject.toJSONString()));
+            System.out.println(aeName + " " + cntName + " - " +  "THIS IS NOT INTERSECTED");
+            System.out.println(aeName + " " + cntName + " - " +  "THIS IS CONTAINES RESULT : " + aggregateValue.get(tmpKey).contains(valueObject.toJSONString()));
             if(aggregateValue.get(tmpKey).contains(valueObject.toJSONString())){
               li = aggregateValue.get(tmpKey);
-              System.out.println("THIS IS LI## : " + li);
+              System.out.println(aeName + " " + cntName + " - " +  "THIS IS LI## : " + li);
               li.remove(valueObject.toJSONString());
-              System.out.println("THIS IS LI#### : " + li);
+              System.out.println(aeName + " " + cntName + " - " +  "THIS IS LI#### : " + li);
               aggregateValue.put(tmpKey, li);
 
               li = aggregateValue.get(jsonObject.toJSONString());
