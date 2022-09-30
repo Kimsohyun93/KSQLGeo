@@ -137,15 +137,16 @@ public class GeoIntersectedCircle extends GeometryBase {
               li.add(valueObject.toJSONString());
               System.out.println(aeName + " " + cntName + " - " +  "THIS IS LI#### : " + li);
               aggregateValue.put(tmpKey, li);
-              System.out.println(aggregateValue.get(tmpKey));
+              System.out.println(aeName + " " + cntName + " - " + aggregateValue.get(tmpKey));
             }
 
             li = aggregateValue.get(jsonObject.toJSONString());
             System.out.println(aeName + " " + cntName + " - " +  "THIS IS LI## : " + li);
-            li.add(key.remove(POLYGON).toString());
+            key.remove(POLYGON);
+            li.add(key.toJSONString());
             System.out.println(aeName + " " + cntName + " - " +  "THIS IS LI#### : " + li);
             aggregateValue.put(jsonObject.toJSONString(), li);
-            System.out.println(aggregateValue.get(jsonObject.toJSONString()));
+            System.out.println(aeName + " " + cntName + " - " + aggregateValue.get(jsonObject.toJSONString()));
 
           }else{
             System.out.println(aeName + " " + cntName + " - " +  "THIS IS NOT INTERSECTED");
