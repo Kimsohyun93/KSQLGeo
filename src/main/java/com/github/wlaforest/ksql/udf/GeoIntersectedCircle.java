@@ -148,7 +148,9 @@ public class GeoIntersectedCircle extends GeometryBase {
             System.out.println("THIS IS CONTAINES RESULT : " + aggregateValue.get(tmpKey).contains(valueObject.toJSONString()));
             if(aggregateValue.get(tmpKey).contains(valueObject.toJSONString())){
               li = aggregateValue.get(tmpKey);
+              System.out.println("THIS IS LI## : " + li);
               li.remove(valueObject.toJSONString());
+              System.out.println("THIS IS LI#### : " + li);
               aggregateValue.put(tmpKey, li);
 
               li = aggregateValue.get(jsonObject.toJSONString());
